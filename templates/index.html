@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Mobile Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Let's Go Bunny</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+    <div class="logo">🐰 Bunny</div>
+
+    <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">FAQs</a></li>
+    </ul>
+
+    <a href="#map" class="book-btn">Book Now</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="home" class="hero">
+    <div class="left">
+        <h1>
+            Let’s <br>
+            Go <br>
+            Bunny
+        </h1>
+    </div>
+
+    <div class="right">
+        <img src="{{ url_for('static', filename='images/model.jpg') }}" alt="Brand Image">
+    </div>
+</section>
+
+<!-- ===== GLOBE SECTION ===== -->
+<section id="globe" class="globe-section">
+    <canvas id="globeCanvas"></canvas>
+</section>
+
+<!-- ===== INDIA MAP + BOOKING ===== -->
+<section id="map" class="map-section">
+
+    <!-- LEFT MAP -->
+    <div class="map-left">
+        <img src="{{ url_for('static', filename='images/india-map.png') }}" alt="India Map">
+    </div>
+
+    <!-- RIGHT FORM -->
+    <div class="map-right">
+        <h2>Find Your Route</h2>
+
+        <!-- FIXED FORM -->
+        <form class="route-form" method="POST" action="/search">
+            <div class="input-box">
+    <input type="text" id="fromInput" placeholder="Enter pickup location 📍" autocomplete="off">
+    <div class="dropdown" id="fromDropdown"></div>
+</div>
+
+<div class="input-box">
+    <input type="text" id="toInput" placeholder="Enter destination 📍" autocomplete="off">
+    <div class="dropdown" id="toDropdown"></div>
+</div>
+            <button type="submit" class="search-btn">
+                Find Opportunities
+            </button>
+        </form>
+    </div>
+
+</section>
+
+<section id="packages" class="packages-section">
+
+    <h2>Choose Your Plan</h2>
+
+    <div class="packages-container">
+
+        <div class="package-card">
+            <h3>Starter Route</h3>
+            <p>Basic delivery with standard timing</p>
+            <button>Select</button>
+        </div>
+
+        <div class="package-card highlight">
+            <h3>Smart Route</h3>
+            <p>Optimized route with faster delivery</p>
+            <button>Select</button>
+        </div>
+
+        <div class="package-card">
+            <h3>Premium Express</h3>
+            <p>Fastest delivery with priority handling</p>
+            <button>Select</button>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===== SCRIPTS ===== -->
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Globe Script -->
+<script src="{{ url_for('static', filename='js/globe.js') }}"></script>
+
+<!-- General Script -->
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== BODY ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+
+    /* BRAND BLUE GRADIENT */
+    background: linear-gradient(135deg, #42a5f5, #1e88e5, #1565c0);
+
+    color: white;
+    overflow-x: hidden;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 60px;
+
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+
+    z-index: 1000;
+}
+
+/* LOGO */
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* NAV LINKS */
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    position: relative;
+    transition: 0.3s;
+}
+
+/* UNDERLINE EFFECT */
+.nav-links li a::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    left: 0;
+    bottom: -5px;
+    background-color: #ffd600;
+    transition: 0.3s;
+}
+
+.nav-links li a:hover::after {
+    width: 100%;
+}
+
+.nav-links li a:hover {
+    color: #ffd600;
+}
+
+/* BOOK BUTTON */
+.book-btn {
+    background: linear-gradient(45deg, #ffd600, #ffea00);
+    padding: 10px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+
+    transition: 0.3s;
+}
+
+.book-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0px 10px 25px rgba(255, 214, 0, 0.5);
+}
+
+/* ===== HERO ===== */
+.hero {
+    display: flex;
+    height: 100vh;
+    padding-top: 80px;
+}
+
+/* LEFT */
+.left {
+    width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* HERO TEXT */
+.left h1 {
+    font-size: 110px;
+    line-height: 1.1;
+    font-weight: 800;
+
+    color: #ffd600;
+
+    text-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
+
+    animation: fadeUp 1.2s ease;
+}
+
+/* GLOW EFFECT */
+.left h1::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+
+    background: radial-gradient(circle, rgba(255,255,255,0.25), transparent);
+
+    top: 20%;
+    left: -60px;
+    z-index: -1;
+}
+
+/* RIGHT */
+.right {
+    width: 55%;
+}
+
+.right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+
+    filter: brightness(95%) contrast(105%);
+}
+
+/* ===== GLOBE SECTION ===== */
+.globe-section {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
+#globeCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ===== MAP SECTION ===== */
+.map-section {
+    display: flex;
+    height: 100vh;
+    padding: 60px;
+    gap: 50px;
+}
+
+/* LEFT MAP */
+.map-left {
+    width: 55%;
+}
+
+.map-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* RIGHT FORM */
+.map-right {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.map-right h2 {
+    font-size: 42px;
+    margin-bottom: 30px;
+    color: #ffd600;
+}
+
+/* FORM */
+.route-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* INPUTS */
+.route-form input {
+    padding: 15px;
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+    border: 2px solid transparent;
+
+    font-size: 16px;
+
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.route-form input:focus {
+    border: 2px solid #ffd600;
+}
+
+/* BUTTON */
+.search-btn {
+    padding: 15px;
+    border-radius: 30px;
+    border: none;
+
+    background: linear-gradient(45deg, #ffd600, #ffea00);
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.search-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 10px 25px rgba(255, 214, 0, 0.5);
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== SCROLL ===== */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1565c0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ffd600;
+    border-radius: 10px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .left h1 {
+        font-size: 80px;
+    }
+
+    .nav-links {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero,
+    .map-section {
+        flex-direction: column;
+    }
+
+    .left,
+    .right,
+    .map-left,
+    .map-right {
+        width: 100%;
+    }
+
+    .left {
+        height: 50vh;
+    }
+
+    .right {
+        height: 50vh;
+    }
+
+    .left h1 {
+        font-size: 60px;
+        text-align: center;
+    }
+
+    .navbar {
+        padding: 15px 30px;
+    }
+
+    .map-section {
+        height: auto;
+    }
+}
+.hidden {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s ease;
+}
+
+.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+#map {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#globe {
+    transition: opacity 1s ease;
+}
+.map-left{
+    height: 150%;
+}
+/* INPUT DROPDOWN */
+.input-box {
+    position: relative;
+}
+
+.dropdown {
+    position: absolute;
+    width: 100%;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10;
+}
+
+.dropdown div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown div:hover {
+    background: #f0f0f0;
+}
+
+/* PACKAGES */
+.packages-section {
+    padding: 80px;
+    text-align: center;
+}
+
+.packages-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.package-card {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    width: 250px;
+    transition: 0.3s;
+}
+
+.package-card:hover {
+    transform: translateY(-10px);
+}
+
+.package-card h3 {
+    color: #ffd600;
+}
+
+.package-card button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    background: #ffd600;
+    cursor: pointer;
+}
+
+/* Highlight middle plan */
+.highlight {
+    transform: scale(1.05);
+    box-shadow: 0px 10px 30px rgba(255,214,0,0.3);
+}
