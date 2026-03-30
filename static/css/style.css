@@ -325,7 +325,6 @@ html {
     transform: translateY(0);
 }
 #map {
-    opacity: 0;
     transition: opacity 1s ease;
 }
 

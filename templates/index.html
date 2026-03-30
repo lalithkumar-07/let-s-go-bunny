@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Let's Go Bunny</title>
+
+    <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -20,9 +23,9 @@
 
     <ul class="nav-links">
         <li><a href="#home">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact Us</a></li>
-        <li><a href="#">FAQs</a></li>
+        <li><a href="#globe">Explore</a></li>
+        <li><a href="#map">Book</a></li>
+        <li><a href="#packages">Plans</a></li>
     </ul>
 
     <a href="#map" class="book-btn">Book Now</a>
@@ -44,12 +47,12 @@
 </section>
 
 <!-- ===== GLOBE SECTION ===== -->
-<section id="globe" class="globe-section">
+<section id="globe" class="globe-section hidden">
     <canvas id="globeCanvas"></canvas>
 </section>
 
 <!-- ===== INDIA MAP + BOOKING ===== -->
-<section id="map" class="map-section">
+<section id="map" class="map-section hidden">
 
     <!-- LEFT MAP -->
     <div class="map-left">
@@ -60,26 +63,32 @@
     <div class="map-right">
         <h2>Find Your Route</h2>
 
-        <!-- FIXED FORM -->
-        <form class="route-form" method="POST" action="/search">
-            <div class="input-box">
-    <input type="text" id="fromInput" placeholder="Enter pickup location 📍" autocomplete="off">
-    <div class="dropdown" id="fromDropdown"></div>
-</div>
+        <form class="route-form">
 
-<div class="input-box">
-    <input type="text" id="toInput" placeholder="Enter destination 📍" autocomplete="off">
-    <div class="dropdown" id="toDropdown"></div>
-</div>
+            <!-- FROM -->
+            <div class="input-box">
+                <input type="text" id="fromInput" placeholder="Enter pickup location 📍" autocomplete="off">
+                <div class="dropdown" id="fromDropdown"></div>
+            </div>
+
+            <!-- TO -->
+            <div class="input-box">
+                <input type="text" id="toInput" placeholder="Enter destination 📍" autocomplete="off">
+                <div class="dropdown" id="toDropdown"></div>
+            </div>
+
+            <!-- BUTTON -->
             <button type="submit" class="search-btn">
                 Find Opportunities
             </button>
+
         </form>
     </div>
 
 </section>
 
-<section id="packages" class="packages-section">
+<!-- ===== PACKAGES ===== -->
+<section id="packages" class="packages-section hidden">
 
     <h2>Choose Your Plan</h2>
 
@@ -115,7 +124,7 @@
 <!-- Globe Script -->
 <script src="{{ url_for('static', filename='js/globe.js') }}"></script>
 
-<!-- General Script -->
+<!-- Main Script -->
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>

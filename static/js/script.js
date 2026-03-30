@@ -88,7 +88,7 @@ function setupDropdown(inputId, dropdownId) {
     });
 }
 
-
+document.getElementById("map").style.opacity = "1";
 // ===== RENDER DROPDOWN =====
 function renderDropdown(input, dropdown) {
     const value = input.value.toLowerCase();
