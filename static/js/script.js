@@ -57,7 +57,7 @@ const observer = new IntersectionObserver((entries) => {
     });
 });
 
-document.querySelectorAll(".map-section, .globe-section").forEach(section => {
+document.querySelectorAll(".map-section, .globe-section, .packages-section").forEach(section => {
     section.classList.add("hidden");
     observer.observe(section);
 });
@@ -87,16 +87,14 @@ function setupDropdown(inputId, dropdownId) {
         }
     });
 }
-
-document.getElementById("map").style.opacity = "1";
 // ===== RENDER DROPDOWN =====
 function renderDropdown(input, dropdown) {
     const value = input.value.toLowerCase();
     dropdown.innerHTML = "";
 
     const filtered = locations.filter(loc =>
-        loc.toLowerCase().includes(value)
-    );
+    loc.toLowerCase().startsWith(value)
+);
 
     if (filtered.length === 0) {
         dropdown.style.display = "none";

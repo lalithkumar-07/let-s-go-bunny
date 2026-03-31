@@ -46,6 +46,46 @@
     </div>
 </section>
 
+
+<section class="about-section">
+
+    <div class="about-container">
+
+        <!-- LEFT CONTENT -->
+        <div class="about-text">
+            <h2>Smart Travel. Smarter Deliveries.</h2>
+
+            <p>
+                Every day, thousands of vehicles return empty after completing trips.
+                This results in wasted fuel, time, and money.
+            </p>
+
+            <p>
+                <strong>Let's Go Bunny</strong> connects these empty routes with people
+                who need transportation or deliveries — turning unused journeys into
+                profitable opportunities.
+            </p>
+
+            <div class="about-points">
+                <span>🚚 Reduce empty trips</span>
+                <span>📦 Deliver goods faster</span>
+                <span>🌍 Travel efficiently</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT VISUAL CARD -->
+        <div class="about-card">
+            <h3>How It Works</h3>
+
+            <div class="step">1. Enter route</div>
+            <div class="step">2. Match vehicles</div>
+            <div class="step">3. Deliver / Travel</div>
+        </div>
+
+    </div>
+
+</section>
 <!-- ===== GLOBE SECTION ===== -->
 <section id="globe" class="globe-section hidden">
     <canvas id="globeCanvas"></canvas>
@@ -65,24 +105,36 @@
 
         <form class="route-form">
 
-            <!-- FROM -->
-            <div class="input-box">
-                <input type="text" id="fromInput" placeholder="Enter pickup location 📍" autocomplete="off">
-                <div class="dropdown" id="fromDropdown"></div>
-            </div>
+    <!-- FROM -->
+    <div class="input-box">
+        <input 
+            type="text" 
+            id="fromInput" 
+            name="from"
+            placeholder="Enter pickup location 📍" 
+            autocomplete="off"
+        >
+        <div class="dropdown" id="fromDropdown"></div>
+    </div>
 
-            <!-- TO -->
-            <div class="input-box">
-                <input type="text" id="toInput" placeholder="Enter destination 📍" autocomplete="off">
-                <div class="dropdown" id="toDropdown"></div>
-            </div>
+    <!-- TO -->
+    <div class="input-box">
+        <input 
+            type="text" 
+            id="toInput" 
+            name="to"
+            placeholder="Enter destination 📍" 
+            autocomplete="off"
+        >
+        <div class="dropdown" id="toDropdown"></div>
+    </div>
 
-            <!-- BUTTON -->
-            <button type="submit" class="search-btn">
-                Find Opportunities
-            </button>
+    <!-- BUTTON -->
+    <button type="submit" class="search-btn">
+        Find Opportunities
+    </button>
 
-        </form>
+</form>
     </div>
 
 </section>
