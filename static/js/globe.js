@@ -13,10 +13,13 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.z = 3;
 
 // RENDERER
-const renderer = new THREE.WebGLRenderer({
+renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true
+    antialias: true,
+    alpha: true   // 🔥 IMPORTANT
 });
+
+renderer.setClearColor(0x000000, 0); // transparent
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 

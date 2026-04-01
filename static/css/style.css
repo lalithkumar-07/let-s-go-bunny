@@ -102,8 +102,13 @@ section {
 
 /* ===== GLOBE ===== */
 .globe-section {
-    height: 75vh; /* reduced gap */
+    height: 65vh; /* tighter */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     position: relative;
+    overflow: hidden; /* prevents overflow gap */
 }
 
 /* ===== MAP SECTION ===== */
