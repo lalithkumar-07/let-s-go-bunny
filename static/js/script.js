@@ -26,7 +26,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-
 // ===== GLOBE → MAP TRANSITION =====
 const globeSection = document.querySelector("#globe");
 const mapSection = document.querySelector("#map");

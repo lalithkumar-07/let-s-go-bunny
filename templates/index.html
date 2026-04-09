@@ -92,52 +92,34 @@
 </section>
 
 <!-- ===== INDIA MAP + BOOKING ===== -->
-<section id="map" class="map-section hidden">
+{% extends "base.html" %}
 
-    <!-- LEFT MAP -->
+{% block content %}
+
+<section class="map-section">
+
     <div class="map-left">
-        <img src="{{ url_for('static', filename='images/india-map.png') }}" alt="India Map">
+        <img src="{{ url_for('static', filename='images/india-map.png') }}">
     </div>
 
-    <!-- RIGHT FORM -->
     <div class="map-right">
+
         <h2>Find Your Route</h2>
 
-        <form class="route-form">
+        <form method="GET" action="/map" class="route-form">
 
-    <!-- FROM -->
-    <div class="input-box">
-        <input 
-            type="text" 
-            id="fromInput" 
-            name="from"
-            placeholder="Enter pickup location 📍" 
-            autocomplete="off"
-        >
-        <div class="dropdown" id="fromDropdown"></div>
-    </div>
+            <input type="text" name="from" id="fromInput" placeholder="From" required>
+            <input type="text" name="to" id="toInput" placeholder="To" required>
 
-    <!-- TO -->
-    <div class="input-box">
-        <input 
-            type="text" 
-            id="toInput" 
-            name="to"
-            placeholder="Enter destination 📍" 
-            autocomplete="off"
-        >
-        <div class="dropdown" id="toDropdown"></div>
-    </div>
+            <button type="submit">Find Route</button>
 
-    <!-- BUTTON -->
-    <button type="submit" class="search-btn">
-        Find Opportunities
-    </button>
+        </form>
 
-</form>
     </div>
 
 </section>
+
+{% endblock %}
 
 <!-- ===== PACKAGES ===== -->
 <section id="packages" class="packages-section hidden">
