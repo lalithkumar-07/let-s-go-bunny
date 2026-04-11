@@ -2,30 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Responsive -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Let's Go Bunny{% endblock %}</title>
 
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Extra CSS (for future pages like map page) -->
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- ===== NAVBAR ===== -->
 <nav class="navbar">
     <div class="logo">🐰 Bunny</div>
 
     <ul class="nav-links">
         <li><a href="/">Home</a></li>
+        <li><a href="#globe">Explore</a></li>
         <li><a href="#map">Book</a></li>
+        <li><a href="#packages">Plans</a></li>
     </ul>
 
     <a href="#map" class="book-btn">Book Now</a>
 </nav>
 
+<!-- ===== PAGE CONTENT ===== -->
 {% block content %}{% endblock %}
 
+
+<!-- ===== CORE SCRIPTS ===== -->
+
+<!-- Three.js (GLOBAL for 3D pages) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- SVG Loader (for India map 3D) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/SVGLoader.js"></script>
+
+<!-- Main JS -->
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<!-- Page-specific JS (VERY IMPORTANT) -->
+{% block extra_js %}{% endblock %}
 
 </body>
 </html>

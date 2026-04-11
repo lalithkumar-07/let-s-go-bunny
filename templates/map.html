@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+{% block title %}Live Route{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  .map-page { padding: 100px 6% 40px; }
+  .map-page h2 { color: #ffd600; margin-bottom: 10px; }
+  .route-display { font-size: 18px; margin-bottom: 20px; opacity: 0.85; }
+  #mapLoader { text-align: center; padding: 20px; opacity: 0.6; }
+
+  /* CRITICAL — Leaflet needs explicit height */
+  #map {
+    height: 420px; width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    margin-bottom: 32px;
+  }
+
+  /* ── STEP INDICATOR ── */
+  .steps { display:flex; align-items:center; margin-bottom:28px; }
+  .step-item { display:flex; align-items:center; gap:8px; flex:1; }
+  .step-dot {
+    width:28px; height:28px; border-radius:50%; display:flex;
+    align-items:center; justify-content:center;
+    font-size:12px; font-weight:600; flex-shrink:0;
+    border:1.5px solid rgba(255,255,255,0.2);
+    color:rgba(255,255,255,0.4); background:transparent; transition:.3s;
+  }
+  .step-dot.active { background:#185FA5; color:#fff; border-color:#185FA5; }
+  .step-dot.done   { background:#1D9E75; color:#fff; border-color:#1D9E75; }
+  .step-label { font-size:12px; color:rgba(255,255,255,0.45); white-space:nowrap; }
+  .step-label.active { color:#fff; font-weight:500; }
+  .step-line { flex:1; height:1px; background:rgba(255,255,255,0.12); margin:0 8px; }
+  .step-line.done { background:#1D9E75; }
+
+  /* ── GLASS CARD ── */
+  .bcard {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .bcard h3 { color:#ffd600; font-size:15px; margin-bottom:16px; }
+
+  /* ── ROUTE BAR ── */
+  .route-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .route-city { font-size:16px; font-weight:600; color:#fff; }
+  .route-arrow { color:rgba(255,255,255,0.4); }
+  .route-meta { display:flex; gap:12px; margin-left:auto; flex-wrap:wrap; }
+  .route-tag {
+    font-size:12px; padding:3px 12px; border-radius:20px;
+    background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7);
+  }
+
+  /* ── TYPE SELECTOR ── */
+  .type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media(max-width:480px){ .type-grid { grid-template-columns:repeat(2,1fr); } }
+  .type-card {
+    border:1px solid rgba(255,255,255,0.1); border-radius:12px;
+    padding:14px 8px; text-align:center; cursor:pointer;
+    background:rgba(255,255,255,0.04); transition:.2s; color:#fff;
+  }
+  .type-card:hover { background:rgba(255,255,255,0.09); }
+  .type-card.selected { border:1.5px solid #ffd600; background:rgba(255,214,0,0.1); }
+  .type-icon { font-size:22px; display:block; margin-bottom:5px; }
+  .tc-label { font-size:12px; font-weight:500; }
+
+  /* ── FORM ── */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:520px){ .form-grid { grid-template-columns:1fr; } }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field.full { grid-column:1/-1; }
+  .field label { font-size:12px; color:rgba(255,255,255,0.6); font-weight:500; }
+  .field input, .field select, .field textarea {
+    font-size:13px; padding:9px 12px; border-radius:10px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.07); color:#fff; outline:none; transition:.2s;
+  }
+  .field input::placeholder { color:rgba(255,255,255,0.3); }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color:#ffd600; background:rgba(255,214,0,0.07);
+  }
+  .field select option { background:#0a192f; color:#fff; }
+  .field textarea { resize:vertical; min-height:70px; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+  .btn-next {
+    padding:9px 24px; border-radius:20px; border:none;
+    background:linear-gradient(45deg,#ffd600,#ffea00);
+    font-weight:600; cursor:pointer; font-size:13px; color:#000;
+  }
+  .btn-back {
+    padding:9px 18px; border-radius:20px; font-size:13px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:transparent; color:rgba(255,255,255,0.6); cursor:pointer;
+  }
+
+  /* ── PRICING CARDS ── */
+  .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media(max-width:640px){ .pricing-grid { grid-template-columns:1fr; } }
+  @media(min-width:641px) and (max-width:860px){ .pricing-grid { grid-template-columns:1fr 1fr; } }
+  .pc {
+    border:1px solid rgba(255,255,255,0.1); border-radius:16px;
+    padding:18px 16px; position:relative; cursor:pointer;
+    background:rgba(255,255,255,0.05); transition:.2s;
+  }
+  .pc:hover { background:rgba(255,255,255,0.08); }
+  .pc.recommended { border:1.5px solid #ffd600; }
+  .pc.selected-plan { border:2px solid #1D9E75; background:rgba(29,158,117,0.1); }
+  .rec-badge {
+    position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+    font-size:11px; padding:2px 12px; border-radius:20px; white-space:nowrap;
+    background:#ffd600; color:#000; font-weight:600;
+  }
+  .pc-name { font-size:13px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .pc-tagline { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+  .pc-price { font-size:28px; font-weight:700; color:#ffd600; }
+  .pc-per { font-size:11px; color:rgba(255,255,255,0.4); margin-bottom:10px; }
+  .pc-divider { height:1px; background:rgba(255,255,255,0.08); margin:10px 0; }
+  .pc-feat {
+    font-size:12px; color:rgba(255,255,255,0.65);
+    padding:3px 0; display:flex; align-items:flex-start; gap:6px;
+  }
+  .pc-feat::before {
+    content:''; display:inline-block; width:6px; height:6px;
+    border-radius:50%; background:#1D9E75; flex-shrink:0; margin-top:4px;
+  }
+  .pc-select-btn {
+    width:100%; margin-top:12px; padding:8px; border-radius:20px;
+    font-size:12px; font-weight:600; cursor:pointer; transition:.2s;
+    border:1px solid rgba(255,255,255,0.2);
+    background:transparent; color:#fff;
+  }
+  .pc.selected-plan .pc-select-btn {
+    background:linear-gradient(45deg,#ffd600,#ffea00); color:#000; border:none;
+  }
+
+  /* ── BREAKDOWN ── */
+  .breakdown {
+    background:rgba(0,0,0,0.2); border-radius:12px;
+    padding:12px 16px; font-size:13px; margin-top:14px;
+  }
+  .br-row { display:flex; justify-content:space-between;
+    padding:3px 0; color:rgba(255,255,255,0.55); }
+  .br-row.total {
+    font-weight:600; color:#fff;
+    border-top:1px solid rgba(255,255,255,0.1);
+    margin-top:6px; padding-top:8px;
+  }
+
+  /* ── CONFIRM ── */
+  .confirm-box { text-align:center; padding:28px 16px; }
+  .confirm-icon {
+    width:52px; height:52px; border-radius:50%;
+    background:rgba(29,158,117,0.2); border:2px solid #1D9E75;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px; font-size:22px;
+  }
+  .confirm-title { font-size:18px; font-weight:700; color:#ffd600; margin-bottom:8px; }
+  .confirm-sub { font-size:13px; color:rgba(255,255,255,0.6); }
+  .confirm-ref {
+    font-size:12px; margin-top:12px; padding:6px 18px; border-radius:20px;
+    background:rgba(255,255,255,0.07); display:inline-block;
+    color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.1);
+  }
+
+  .hidden { display:none !important; }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<section class="map-page">
+
+  <h2>🚚 Live Route</h2>
+  <p class="route-display">
+    <span id="fromText">{{ from_location }}</span> →
+    <span id="toText">{{ to_location }}</span>
+  </p>
+
+  <div id="mapLoader">Loading route...</div>
+  <div id="map"></div>
+
+  <!-- BOOKING FLOW (hidden until route loads) -->
+  <div id="bookingFlow" class="hidden">
+
+    <!-- Step bar -->
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-dot active" id="sd1">1</div>
+        <span class="step-label active" id="sl1">Shipment type</span>
+      </div>
+      <div class="step-line" id="sl12"></div>
+      <div class="step-item">
+        <div class="step-dot" id="sd2">2</div>
+        <span class="step-label" id="sl2">Your details</span>
+      </div>
+      <div class="step-line" id="sl23"></div>
+      <div class="step-item">
+        <div class="step-dot" id="sd3">3</div>
+        <span class="step-label" id="sl3">Choose plan</span>
+      </div>
+      <div class="step-line" id="sl34"></div>
+      <div class="step-item">
+        <div class="step-dot" id="sd4">4</div>
+        <span class="step-label" id="sl4">Confirm</span>
+      </div>
+    </div>
+
+    <!-- Route summary card -->
+    <div class="bcard">
+      <div class="route-bar">
+        <span class="route-city">{{ from_location }}</span>
+        <span class="route-arrow">→</span>
+        <span class="route-city">{{ to_location }}</span>
+        <div class="route-meta">
+          <span class="route-tag" id="rc-dist">Calculating...</span>
+          <span class="route-tag" id="rc-time"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="bcard" id="step1">
+      <h3>What are you sending?</h3>
+      <div class="type-grid">
+        <div class="type-card" data-type="self"      onclick="selectType(this)"><span class="type-icon">🧍</span><div class="tc-label">Myself</div></div>
+        <div class="type-card" data-type="parcel"    onclick="selectType(this)"><span class="type-icon">📦</span><div class="tc-label">Parcel</div></div>
+        <div class="type-card" data-type="documents" onclick="selectType(this)"><span class="type-icon">📄</span><div class="tc-label">Documents</div></div>
+        <div class="type-card" data-type="furniture" onclick="selectType(this)"><span class="type-icon">🛋</span><div class="tc-label">Furniture</div></div>
+        <div class="type-card" data-type="vehicle"   onclick="selectType(this)"><span class="type-icon">🚗</span><div class="tc-label">Vehicle</div></div>
+        <div class="type-card" data-type="other"     onclick="selectType(this)"><span class="type-icon">📫</span><div class="tc-label">Other goods</div></div>
+      </div>
+      <div id="subfields" style="margin-top:16px;"></div>
+      <div class="btn-row">
+        <button class="btn-next" onclick="goStep(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="bcard hidden" id="step2">
+      <h3>Your details</h3>
+      <div class="form-grid">
+        <div class="field"><label>Full name</label><input type="text" id="f-name" placeholder="Ravi Kumar"></div>
+        <div class="field"><label>Phone number</label><input type="tel" id="f-phone" placeholder="+91 98765 43210"></div>
+        <div class="field"><label>Pickup address</label><input type="text" id="f-pickup" placeholder="Street, area, city"></div>
+        <div class="field"><label>Drop address</label><input type="text" id="f-drop" placeholder="Street, area, city"></div>
+        <div class="field full"><label>Special instructions (optional)</label>
+          <textarea id="f-notes" placeholder="Fragile items, timing, access info..."></textarea></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" onclick="goStep(3)">See pricing →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="bcard hidden" id="step3">
+      <h3>Choose your plan</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:18px;" id="pricing-sub"></p>
+      <div class="pricing-grid" id="pricingGrid"></div>
+      <div class="breakdown" id="pricingBreakdown"></div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="goStep(4)">Confirm booking →</button>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="bcard hidden" id="step4">
+      <div class="confirm-box">
+        <div class="confirm-icon">✓</div>
+        <div class="confirm-title" id="conf-title">Booking confirmed!</div>
+        <div class="confirm-sub"  id="conf-sub"></div>
+        <div class="confirm-ref"  id="conf-ref"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/pricing.js') }}"></script>
+<script>
+const FROM = "{{ from_location }}";
+const TO   = "{{ to_location }}";
+
+// ── MAP ──
+const map = L.map('map').setView([20.5937, 78.9629], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { attribution: '© OpenStreetMap contributors' }).addTo(map);
+
+// ── STATE ──
+const STATE = {
+  type: null, weightKg: 50, passengers: 1,
+  from: FROM, to: TO,
+  distKm: 0, timeHrs: 0,
+  selectedPlan: 'smart'
+};
+
+async function getCoords(place) {
+  const res  = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)},India`);
+  const data = await res.json();
+  if (!data.length) throw new Error('Not found: ' + place);
+  return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+}
+
+function animateVehicle(latLngs) {
+  const dot = L.circleMarker(latLngs[0], { radius:7, color:'#ffea00', fillColor:'#ffea00', fillOpacity:1 }).addTo(map);
+  let i = 0;
+  const step = Math.max(1, Math.floor(latLngs.length / 120));
+  const iv = setInterval(() => {
+    i += step;
+    if (i >= latLngs.length) { clearInterval(iv); map.removeLayer(dot); return; }
+    dot.setLatLng(latLngs[i]);
+  }, 30);
+}
+
+async function drawRoute() {
+  try {
+    const fromC = await getCoords(FROM);
+    const toC   = await getCoords(TO);
+    const url   = `https://router.project-osrm.org/route/v1/driving/${fromC[1]},${fromC[0]};${toC[1]},${toC[0]}?overview=full&geometries=geojson`;
+    const data  = await (await fetch(url)).json();
+    if (data.code !== 'Ok') throw new Error('Route failed');
+
+    const r       = data.routes[0];
+    const latLngs = r.geometry.coordinates.map(([lng,lat]) => [lat,lng]);
+    STATE.distKm  = Math.round(r.distance / 1000);
+    STATE.timeHrs = (r.duration / 3600).toFixed(1);
+
+    const line = L.polyline(latLngs, { color:'#ffd600', weight:6 }).addTo(map);
+    map.fitBounds(line.getBounds(), { padding:[40,40] });
+    L.marker(latLngs[0]).addTo(map).bindPopup(`<b>${FROM}</b>`).openPopup();
+    L.marker(latLngs[latLngs.length-1]).addTo(map).bindPopup(`<b>${TO}</b>`);
+    animateVehicle(latLngs);
+
+    document.getElementById('mapLoader').style.display = 'none';
+    document.getElementById('rc-dist').textContent = STATE.distKm.toLocaleString('en-IN') + ' km';
+    document.getElementById('rc-time').textContent = '~' + STATE.timeHrs + ' hrs';
+
+    // Show booking flow after route loads
+    document.getElementById('bookingFlow').classList.remove('hidden');
+
+  } catch(e) {
+    document.getElementById('mapLoader').textContent = 'Could not load route. Try again.';
+    console.error(e);
+  }
+}
+
+// ── BOOKING FLOW ──
+const SUBFIELDS = {
+  self:`<div class="form-grid">
+    <div class="field"><label>Passengers</label>
+      <select onchange="STATE.passengers=parseInt(this.value)">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+      </select></div>
+    <div class="field"><label>Luggage (kg)</label>
+      <input type="number" value="20" min="0" onchange="STATE.weightKg=parseInt(this.value)||20">
+    </div></div>`,
+  parcel:`<div class="form-grid">
+    <div class="field"><label>Weight (kg)</label>
+      <input type="number" value="10" min="1" onchange="STATE.weightKg=parseInt(this.value)||10">
+    </div>
+    <div class="field"><label>Dimensions</label>
+      <input type="text" placeholder="e.g. 40×30×20 cm">
+    </div></div>`,
+  documents:`<div class="form-grid">
+    <div class="field"><label>Number of envelopes</label>
+      <input type="number" value="1" min="1" onchange="STATE.weightKg=Math.max(1,parseInt(this.value)||1)*0.2">
+    </div></div>`,
+  furniture:`<div class="form-grid">
+    <div class="field"><label>Total weight (kg)</label>
+      <input type="number" value="200" min="10" onchange="STATE.weightKg=parseInt(this.value)||200">
+    </div>
+    <div class="field"><label>Number of items</label>
+      <input type="number" value="3" min="1">
+    </div></div>`,
+  vehicle:`<div class="form-grid">
+    <div class="field"><label>Vehicle type</label>
+      <select onchange="STATE.weightKg=parseInt(this.value)">
+        <option value="800">Two-wheeler</option>
+        <option value="1200">Hatchback</option>
+        <option value="1500" selected>Sedan / SUV</option>
+        <option value="2500">Large SUV / Van</option>
+      </select></div></div>`,
+  other:`<div class="form-grid">
+    <div class="field"><label>Description</label>
+      <input type="text" placeholder="What are you sending?">
+    </div>
+    <div class="field"><label>Weight (kg)</label>
+      <input type="number" value="30" min="1" onchange="STATE.weightKg=parseInt(this.value)||30">
+    </div></div>`,
+};
+
+const TIERS = [
+  { key:'economy', name:'Economy',  tagline:'Standard, flexible timing', mult:1.0,  days:'2–3 days',
+    feats:['Standard truck','Basic GPS tracking','Standard insurance','Free cancellation'] },
+  { key:'smart',   name:'Smart',    tagline:'Optimised + dedicated vehicle', mult:1.55, days:'Next day', recommended:true,
+    feats:['Dedicated vehicle','Live GPS tracking','Enhanced insurance','Priority support'] },
+  { key:'premium', name:'Premium',  tagline:'Express, priority handling', mult:2.2,  days:'Same day',
+    feats:['Express dispatch','Real-time ETA alerts','Full coverage','Guaranteed slot'] },
+];
+
+function selectType(el) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.type = el.dataset.type;
+  document.getElementById('subfields').innerHTML = SUBFIELDS[STATE.type] || '';
+}
+
+function goStep(n) {
+  if (n === 2 && !STATE.type) { alert('Please select a shipment type.'); return; }
+  if (n === 4) {
+    const name  = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    if (!name || !phone) { alert('Please fill in your name and phone.'); return; }
+    STATE.name = name;
+    renderConfirm();
+  }
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('hidden', i !== n);
+  });
+  updateStepBar(n);
+  if (n === 3) renderPricing();
+  window.scrollTo({ top: document.getElementById('bookingFlow').offsetTop - 20, behavior:'smooth' });
+}
+
+function updateStepBar(n) {
+  [1,2,3,4].forEach(i => {
+    const dot = document.getElementById('sd'+i);
+    const lbl = document.getElementById('sl'+i);
+    dot.className = 'step-dot' + (i<n?' done': i===n?' active':'');
+    dot.textContent = i < n ? '✓' : i;
+    lbl.className = 'step-label' + (i===n?' active':'');
+  });
+  ['12','23','34'].forEach(pair => {
+    const line = document.getElementById('sl'+pair);
+    if (line) line.className = 'step-line' + (n > parseInt(pair[0]) ? ' done' : '');
+  });
+}
+
+function calcPrice(tier) {
+  const base = 180 + STATE.distKm * 1.8 + STATE.weightKg * 0.9;
+  return Math.round(base * tier.mult);
+}
+
+function renderPricing() {
+  document.getElementById('pricing-sub').textContent =
+    `${STATE.from} → ${STATE.to} · ${STATE.distKm} km · ${STATE.weightKg} kg`;
+
+  document.getElementById('pricingGrid').innerHTML = TIERS.map(t => {
+    const price = calcPrice(t);
+    const isSel = STATE.selectedPlan === t.key;
+    return `<div class="pc${t.recommended?' recommended':''}${isSel?' selected-plan':''}" onclick="selectPlan('${t.key}')">
+      ${t.recommended ? '<div class="rec-badge">Most popular</div>' : ''}
+      <div class="pc-name">${t.name}</div>
+      <div class="pc-tagline">${t.tagline}</div>
+      <div class="pc-price">₹${price.toLocaleString('en-IN')}</div>
+      <div class="pc-per">${t.days} delivery</div>
+      <div class="pc-divider"></div>
+      ${t.feats.map(f=>`<div class="pc-feat">${f}</div>`).join('')}
+      <button class="pc-select-btn">${isSel ? 'Selected ✓' : 'Select plan'}</button>
+    </div>`;
+  }).join('');
+
+  const sel  = TIERS.find(t => t.key === STATE.selectedPlan);
+  const selP = calcPrice(sel);
+  const distC = Math.round(STATE.distKm * 1.8);
+  const wtC   = Math.round(STATE.weightKg * 0.9);
+
+  document.getElementById('pricingBreakdown').innerHTML = `
+    <div class="br-row"><span>Base fee</span><span>₹180</span></div>
+    <div class="br-row"><span>Distance · ${STATE.distKm} km × ₹1.8</span><span>₹${distC.toLocaleString('en-IN')}</span></div>
+    <div class="br-row"><span>Weight · ${STATE.weightKg} kg × ₹0.9</span><span>₹${wtC.toLocaleString('en-IN')}</span></div>
+    <div class="br-row"><span>${sel.name} multiplier (×${sel.mult})</span><span>×${sel.mult}</span></div>
+    <div class="br-row total"><span>Total · ${sel.name}</span><span>₹${selP.toLocaleString('en-IN')}</span></div>`;
+}
+
+function selectPlan(key) {
+  STATE.selectedPlan = key;
+  renderPricing();
+}
+
+function renderConfirm() {
+  const sel  = TIERS.find(t => t.key === STATE.selectedPlan);
+  const price = calcPrice(sel);
+  const ref  = 'BNY-' + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('conf-title').textContent = `Confirmed, ${STATE.name.split(' ')[0]}!`;
+  document.getElementById('conf-sub').textContent =
+    `${sel.name} · ${STATE.from} → ${STATE.to} · ₹${price.toLocaleString('en-IN')}`;
+  document.getElementById('conf-ref').textContent = 'Ref: ' + ref;
+}
+
+drawRoute();
+</script>
+{% endblock %}

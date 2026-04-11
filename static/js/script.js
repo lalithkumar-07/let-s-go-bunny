@@ -1,118 +1,113 @@
-// ===== NAVBAR SCROLL EFFECT =====
+// ===============================
+// NAVBAR SCROLL EFFECT
+// ===============================
 const navbar = document.querySelector(".navbar");
 
 window.addEventListener("scroll", () => {
     if (!navbar) return;
 
     if (window.scrollY > 50) {
-        navbar.style.background = "rgba(0, 0, 0, 0.3)";
-        navbar.style.backdropFilter = "blur(15px)";
-    } else {
-        navbar.style.background = "rgba(255, 255, 255, 0.08)";
+        navbar.style.background = "rgba(10, 25, 47, 0.6)";
         navbar.style.backdropFilter = "blur(12px)";
+    } else {
+        navbar.style.background = "transparent";
+        navbar.style.backdropFilter = "blur(0px)";
     }
 });
 
 
-// ===== SMOOTH SCROLL =====
+// ===============================
+// SMOOTH SCROLL
+// ===============================
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-
         const target = document.querySelector(this.getAttribute("href"));
         if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
         }
     });
-});
-
-// ===== GLOBE → MAP TRANSITION =====
-const globeSection = document.querySelector("#globe");
-const mapSection = document.querySelector("#map");
-
-let globeTriggered = false;
-
-window.addEventListener("scroll", () => {
-    if (!globeSection || !mapSection) return;
-
-    const globeTop = globeSection.getBoundingClientRect().top;
-
-    if (globeTop < window.innerHeight / 2 && !globeTriggered) {
-        globeTriggered = true;
-
-        setTimeout(() => {
-            mapSection.scrollIntoView({ behavior: "smooth" });
-        }, 2000);
-    }
-});
 
 
-// ===== FADE-IN ANIMATION =====
+// ===============================
+// SECTION FADE-IN (FIXED)
+// ===============================
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add("show");
         }
     });
-});
+}, { threshold: 0.15 });
 
-document.querySelectorAll(".map-section, .globe-section, .packages-section").forEach(section => {
-    section.classList.add("hidden");
+document.querySelectorAll(".globe-section, .map-section, .packages-section")
+.forEach(section => {
+    section.classList.remove("hidden"); // IMPORTANT FIX
     observer.observe(section);
 });
 
 
-// ===== LOCATIONS =====
+// ===============================
+// LOCATIONS DATA
+// ===============================
 const locations = [
     "Delhi", "Mumbai", "Hyderabad", "Bangalore",
     "Chennai", "Kolkata", "Ahmedabad",
-    "Pune", "Jaipur", "Lucknow"
+    "Pune", "Jaipur", "Lucknow",
+    "Surat", "Indore", "Bhopal", "Patna"
 ];
 
 
-// ===== DROPDOWN SETUP =====
+// ===============================
+// SMART DROPDOWN (SEARCH ENGINE STYLE)
+// ===============================
 function setupDropdown(inputId, dropdownId) {
     const input = document.getElementById(inputId);
     const dropdown = document.getElementById(dropdownId);
 
     if (!input || !dropdown) return;
 
-    input.addEventListener("focus", () => renderDropdown(input, dropdown));
-    input.addEventListener("input", () => renderDropdown(input, dropdown));
+    input.addEventListener("input", () => {
+        const value = input.value.toLowerCase().trim();
+        dropdown.innerHTML = "";
 
+        if (!value) {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        const filtered = locations.filter(loc =>
+            loc.toLowerCase().includes(value)
+        );
+
+        if (filtered.length === 0) {
+            dropdown.style.display = "none";
+            return;
+        }
+
+        filtered.forEach(loc => {
+            const item = document.createElement("div");
+            item.classList.add("dropdown-item");
+            item.textContent = loc;
+
+            item.addEventListener("click", () => {
+                input.value = loc;
+                dropdown.style.display = "none";
+            });
+
+            dropdown.appendChild(item);
+        });
+
+        dropdown.style.display = "block";
+    });
+
+    // Close dropdown
     document.addEventListener("click", (e) => {
         if (!input.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.style.display = "none";
         }
     });
-}
-// ===== RENDER DROPDOWN =====
-function renderDropdown(input, dropdown) {
-    const value = input.value.toLowerCase();
-    dropdown.innerHTML = "";
-
-    const filtered = locations.filter(loc =>
-    loc.toLowerCase().startsWith(value)
-);
-
-    if (filtered.length === 0) {
-        dropdown.style.display = "none";
-        return;
-    }
-
-    filtered.forEach(loc => {
-        const item = document.createElement("div");
-        item.textContent = loc;
-
-        item.addEventListener("click", () => {
-            input.value = loc;
-            dropdown.style.display = "none";
-        });
-
-        dropdown.appendChild(item);
-    });
-
-    dropdown.style.display = "block";
 }
 
 
@@ -121,7 +116,9 @@ setupDropdown("fromInput", "fromDropdown");
 setupDropdown("toInput", "toDropdown");
 
 
-// ===== FORM SUBMIT (FINAL CLEAN VERSION) =====
+// ===============================
+// FORM SUBMIT (UPGRADED)
+// ===============================
 const form = document.querySelector(".route-form");
 
 if (form) {
@@ -136,13 +133,37 @@ if (form) {
             return;
         }
 
+        // Store values (for next page or map)
+        localStorage.setItem("from", from);
+        localStorage.setItem("to", to);
+
         console.log("From:", from);
         console.log("To:", to);
 
-        // Scroll to packages
+        // Smooth scroll to packages
         const packages = document.getElementById("packages");
         if (packages) {
             packages.scrollIntoView({ behavior: "smooth" });
         }
     });
 }
+
+
+// ===============================
+// PACKAGE CLICK → FUTURE ROUTING PAGE
+// ===============================
+document.querySelectorAll(".package-card button").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+        const from = localStorage.getItem("from");
+        const to = localStorage.getItem("to");
+
+        if (!from || !to) {
+            alert("Please select route first.");
+            return;
+        }
+
+        // FUTURE PAGE (you will create next)
+        window.location.href = "/route-map";
+    });
+});

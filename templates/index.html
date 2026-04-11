@@ -2,173 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <!-- Mobile Responsive -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Let's Go Bunny</title>
-
-    <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-<!-- ===== NAVBAR ===== -->
 <nav class="navbar">
     <div class="logo">🐰 Bunny</div>
-
     <ul class="nav-links">
         <li><a href="#home">Home</a></li>
         <li><a href="#globe">Explore</a></li>
         <li><a href="#map">Book</a></li>
         <li><a href="#packages">Plans</a></li>
     </ul>
-
     <a href="#map" class="book-btn">Book Now</a>
 </nav>
 
-<!-- ===== HERO ===== -->
 <section id="home" class="hero">
     <div class="left">
-        <h1>
-            Let’s <br>
-            Go <br>
-            Bunny
-        </h1>
+        <h1>Let's <br>Go <br>Bunny</h1>
     </div>
-
     <div class="right">
         <img src="{{ url_for('static', filename='images/model.jpg') }}" alt="Brand Image">
     </div>
 </section>
 
-
 <section class="about-section">
-
     <div class="about-container">
-
-        <!-- LEFT CONTENT -->
         <div class="about-text">
             <h2>Smart Travel. Smarter Deliveries.</h2>
-
-            <p>
-                Every day, thousands of vehicles return empty after completing trips.
-                This results in wasted fuel, time, and money.
-            </p>
-
-            <p>
-                <strong>Let's Go Bunny</strong> connects these empty routes with people
-                who need transportation or deliveries — turning unused journeys into
-                profitable opportunities.
-            </p>
-
+            <p>Every day, thousands of vehicles return empty after completing trips. This results in wasted fuel, time, and money.</p>
+            <p><strong>Let's Go Bunny</strong> connects these empty routes with people who need transportation or deliveries — turning unused journeys into profitable opportunities.</p>
             <div class="about-points">
                 <span>🚚 Reduce empty trips</span>
                 <span>📦 Deliver goods faster</span>
                 <span>🌍 Travel efficiently</span>
             </div>
-
         </div>
-
-        <!-- RIGHT VISUAL CARD -->
         <div class="about-card">
             <h3>How It Works</h3>
-
             <div class="step">1. Enter route</div>
             <div class="step">2. Match vehicles</div>
             <div class="step">3. Deliver / Travel</div>
         </div>
-
     </div>
-
-</section>
-<!-- ===== GLOBE SECTION ===== -->
-<section id="globe" class="globe-section hidden">
-    <canvas id="globeCanvas"></canvas>
 </section>
 
-<!-- ===== INDIA MAP + BOOKING ===== -->
-{% extends "base.html" %}
+<section id="globe" class="globe-section">
+    <!-- FIX: target a div, not a canvas -->
+    <div id="globeContainer" style="width:100%;height:100%;"></div>
+</section>
 
-{% block content %}
-
-<section class="map-section">
-
+<section id="map" class="map-section">
     <div class="map-left">
-        <img src="{{ url_for('static', filename='images/india-map.png') }}">
+        <img src="{{ url_for('static', filename='images/india.svg') }}" alt="India Map">
     </div>
-
     <div class="map-right">
-
         <h2>Find Your Route</h2>
-
         <form method="GET" action="/map" class="route-form">
 
-            <input type="text" name="from" id="fromInput" placeholder="From" required>
-            <input type="text" name="to" id="toInput" placeholder="To" required>
+            <!-- FIX: added dropdown divs -->
+            <div class="input-box">
+                <input type="text" name="from" id="fromInput" placeholder="From" autocomplete="off" required>
+                <div class="dropdown" id="fromDropdown"></div>
+            </div>
 
-            <button type="submit">Find Route</button>
+            <div class="input-box">
+                <input type="text" name="to" id="toInput" placeholder="To" autocomplete="off" required>
+                <div class="dropdown" id="toDropdown"></div>
+            </div>
 
+            <!-- FIX: correct class name -->
+            <button type="submit" class="search-btn">Find Route</button>
         </form>
-
     </div>
-
 </section>
 
-{% endblock %}
 
-<!-- ===== PACKAGES ===== -->
-<section id="packages" class="packages-section hidden">
-
-    <h2>Choose Your Plan</h2>
-
-    <div class="packages-container">
-
-        <!-- BASIC -->
-        <div class="package-card">
-            <h3>Starter Route</h3>
-            <p class="route-text">Route: --</p>
-            <p class="desc">Basic delivery with standard timing</p>
-            <p class="price">₹ --</p>
-            <button>Select</button>
-        </div>
-
-        <!-- SMART -->
-        <div class="package-card highlight">
-            <h3>Smart Route</h3>
-            <p class="route-text">Route: --</p>
-            <p class="desc">Optimized route with faster delivery</p>
-            <p class="price">₹ --</p>
-            <button>Select</button>
-        </div>
-
-        <!-- PREMIUM -->
-        <div class="package-card">
-            <h3>Premium Express</h3>
-            <p class="route-text">Route: --</p>
-            <p class="desc">Fastest delivery with priority handling</p>
-            <p class="price">₹ --</p>
-            <button>Select</button>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===== SCRIPTS ===== -->
-
-<!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<!-- Globe Script -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/SVGLoader.js"></script>
 <script src="{{ url_for('static', filename='js/globe.js') }}"></script>
-
-<!-- Main Script -->
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
 </body>
 </html>
