@@ -4,13 +4,13 @@ import { TripProvider } from "./context/TripContext";
 
 // Pages
 import HomePage       from "./pages/HomePage";
-import PlannerPage    from "./pages/PlannerPage";
-import MapPage        from "./pages/MapPage";
-import StopsPage      from "./pages/StopsPage";
-import HotelsPage     from "./pages/HotelsPage";
-import GuidesPage     from "./pages/GuidesPage";
-import BookingPage    from "./pages/BookingPage";
-import NotFoundPage   from "./pages/NotFoundPage";
+// import PlannerPage    from "./pages/PlannerPage";
+// import MapPage        from "./pages/MapPage";
+// import StopsPage      from "./pages/StopsPage";
+// import HotelsPage     from "./pages/HotelsPage";
+// import GuidesPage     from "./pages/GuidesPage";
+// import BookingPage    from "./pages/BookingPage";
+// import NotFoundPage   from "./pages/NotFoundPage";
 
 /* Scroll to top on every route change */
 function ScrollReset() {
